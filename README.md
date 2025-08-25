@@ -1,37 +1,37 @@
-# Express.js MongoDB JWT Authentication Starter
+# TypeScript Express.js MongoDB JWT Authentication
 
-Starter pack backend Express.js yang lengkap dengan sistem autentikasi JWT dan MongoDB menggunakan Mongoose.
+A modern, type-safe Express.js backend with MongoDB and comprehensive JWT authentication system built with TypeScript.
 
 ## 🚀 Features
 
 ### Core Features
-- **Express.js Server** - Web framework dengan routing yang terstruktur
-- **MongoDB Integration** - Database dengan Mongoose ODM
-- **JWT Authentication** - Access token dan refresh token system
-- **Password Security** - Bcrypt hashing dengan salt
-- **Input Validation** - Express-validator untuk validasi data
-- **Error Handling** - Comprehensive error handling middleware
+- **TypeScript** - Full type safety throughout the application
+- **Express.js Server** - Modern web framework with typed routing
+- **MongoDB Integration** - Database with Mongoose ODM and TypeScript interfaces
+- **JWT Authentication** - Access token and refresh token system with full typing
+- **Password Security** - Bcrypt hashing with salt
+- **Input Validation** - Express-validator with TypeScript support
+- **Error Handling** - Comprehensive typed error handling middleware
 - **Security Middleware** - Helmet, CORS, rate limiting
-- **Role-Based Access** - User roles (user, admin, moderator)
+- **Role-Based Access** - User roles (user, admin, moderator) with type safety
 
 ### Authentication Features
-- User registration dan login
+- User registration and login with typed request/response
 - JWT access token (short-lived)
 - JWT refresh token (long-lived)
 - Token refresh mechanism
 - Logout single device
 - Logout all devices
-- Password change
+- Password change with validation
 - Profile management
 
-### Security Features
-- Password hashing dengan bcrypt
-- JWT token dengan expiration
-- HTTP-only cookies untuk refresh token
-- Rate limiting
-- CORS protection
-- Helmet security headers
-- Input validation dan sanitization
+### TypeScript Features
+- **Strict Type Checking** - Full TypeScript strict mode enabled
+- **Interface Definitions** - Comprehensive interfaces for all data structures
+- **Type-Safe Middleware** - All middleware functions are properly typed
+- **Generic API Responses** - Reusable response types
+- **Environment Variables** - Typed environment configuration
+- **Request/Response Typing** - Full typing for Express routes
 
 ## 📦 Dependencies
 
@@ -49,41 +49,45 @@ Starter pack backend Express.js yang lengkap dengan sistem autentikasi JWT dan M
 - `dotenv` - Environment variables
 
 ### Development Dependencies
+- `typescript` - TypeScript compiler
+- `ts-node` - TypeScript execution environment
 - `nodemon` - Development server
+- `@types/*` - Type definitions for all dependencies
 
 ## 🛠️ Installation
 
-1. **Clone atau copy project files**
-
-2. **Install dependencies**
+1. **Install dependencies**
    ```bash
    npm install
    ```
 
-3. **Setup environment variables**
-   ```bash
-   cp .env.example .env
-   ```
-   Edit `.env` file dengan konfigurasi Anda:
+2. **Setup environment variables**
+   Edit `.env` file with your configuration:
    ```env
    NODE_ENV=development
    PORT=5000
-   MONGODB_URI=mongodb://localhost:27017/express-jwt-starter
+   MONGODB_URI=mongodb://localhost:27017/typescript-express-auth
    JWT_SECRET=your-super-secret-jwt-key
    JWT_REFRESH_SECRET=your-super-secret-refresh-key
-   # ... dan lainnya
+   # ... and others
    ```
 
-4. **Start MongoDB**
-   Pastikan MongoDB berjalan di sistem Anda
+3. **Start MongoDB**
+   Ensure MongoDB is running on your system
 
-5. **Run the application**
+4. **Run the application**
    ```bash
-   # Development mode
+   # Development mode (with TypeScript compilation)
    npm run dev
    
-   # Production mode
+   # Build TypeScript to JavaScript
+   npm run build
+   
+   # Production mode (run compiled JavaScript)
    npm start
+   
+   # Type checking only
+   npm run type-check
    ```
 
 ## 📚 API Documentation
@@ -91,255 +95,273 @@ Starter pack backend Express.js yang lengkap dengan sistem autentikasi JWT dan M
 ### Authentication Routes (`/api/auth`)
 
 #### Register User
-```http
+```typescript
 POST /api/auth/register
 Content-Type: application/json
 
-{
-  "username": "johndoe",
-  "email": "john@example.com",
-  "password": "Password123",
-  "firstName": "John",
-  "lastName": "Doe"
+interface RegisterRequest {
+  username: string;
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
+
+interface AuthResponse {
+  success: boolean;
+  message: string;
+  data: {
+    user: Omit<IUser, 'password' | 'refreshTokens'>;
+    accessToken: string;
+  };
 }
 ```
 
 #### Login User
-```http
+```typescript
 POST /api/auth/login
 Content-Type: application/json
 
-{
-  "email": "john@example.com",
-  "password": "Password123"
+interface LoginRequest {
+  email: string;
+  password: string;
 }
 ```
 
 #### Refresh Token
-```http
+```typescript
 POST /api/auth/refresh
 Cookie: refreshToken=your_refresh_token
-```
 
-#### Logout
-```http
-POST /api/auth/logout
-Authorization: Bearer your_access_token
-```
-
-#### Logout All Devices
-```http
-POST /api/auth/logout-all
-Authorization: Bearer your_access_token
-```
-
-#### Get Current User
-```http
-GET /api/auth/me
-Authorization: Bearer your_access_token
+interface RefreshResponse {
+  success: boolean;
+  message: string;
+  data: {
+    accessToken: string;
+  };
+}
 ```
 
 ### User Routes (`/api/users`)
 
-#### Get Profile
-```http
-GET /api/users/profile
-Authorization: Bearer your_access_token
-```
-
 #### Update Profile
-```http
+```typescript
 PUT /api/users/profile
 Authorization: Bearer your_access_token
 Content-Type: application/json
 
-{
-  "firstName": "Jane",
-  "lastName": "Doe",
-  "username": "janedoe"
+interface UpdateProfileRequest {
+  firstName?: string;
+  lastName?: string;
+  username?: string;
 }
 ```
 
 #### Change Password
-```http
+```typescript
 PUT /api/users/change-password
 Authorization: Bearer your_access_token
 Content-Type: application/json
 
-{
-  "currentPassword": "OldPassword123",
-  "newPassword": "NewPassword123"
+interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
 }
-```
-
-#### Get All Users (Admin Only)
-```http
-GET /api/users?page=1&limit=10&search=john&role=user
-Authorization: Bearer admin_access_token
-```
-
-### Protected Routes (`/api/protected`)
-
-#### User Protected Route
-```http
-GET /api/protected/user
-Authorization: Bearer your_access_token
-```
-
-#### Admin Protected Route
-```http
-GET /api/protected/admin
-Authorization: Bearer admin_access_token
-```
-
-#### Optional Auth Route
-```http
-GET /api/protected/optional
-Authorization: Bearer your_access_token (optional)
 ```
 
 ## 🏗️ Project Structure
 
 ```
+src/
+├── types/
+│   └── index.ts             # All TypeScript interfaces and types
+├── config/
+│   └── database.ts          # Database connection configuration
 ├── models/
-│   └── User.js              # User model dengan Mongoose
-├── routes/
-│   ├── auth.js              # Authentication routes
-│   ├── users.js             # User management routes
-│   └── protected.js         # Protected route examples
+│   └── User.ts              # User model with TypeScript interfaces
 ├── middleware/
-│   ├── auth.js              # JWT authentication middleware
-│   ├── validation.js        # Input validation middleware
-│   └── errorHandler.js      # Error handling middleware
-├── server.js                # Main application file
-├── .env                     # Environment variables
-├── .env.example             # Environment variables example
-├── .gitignore              # Git ignore rules
-├── package.json            # Dependencies and scripts
-└── README.md               # This file
+│   ├── auth.ts              # JWT authentication middleware
+│   ├── validation.ts        # Input validation middleware
+│   └── errorHandler.ts      # Error handling middleware
+├── routes/
+│   ├── auth.ts              # Authentication routes
+│   ├── users.ts             # User management routes
+│   └── protected.ts         # Protected route examples
+└── server.ts                # Main application file
 ```
 
-## 🔧 Configuration
+## 🔧 TypeScript Configuration
 
-### Environment Variables
+### Key TypeScript Features Used
 
-- `NODE_ENV` - Environment (development/production)
-- `PORT` - Server port (default: 5000)
-- `MONGODB_URI` - MongoDB connection string
-- `JWT_SECRET` - JWT access token secret
-- `JWT_REFRESH_SECRET` - JWT refresh token secret
-- `JWT_EXPIRE` - Access token expiration (default: 15m)
-- `JWT_REFRESH_EXPIRE` - Refresh token expiration (default: 7d)
-- `COOKIE_SECRET` - Cookie parser secret
-- `FRONTEND_URL` - Frontend URL for CORS
-- `RATE_LIMIT_WINDOW_MS` - Rate limiting window
-- `RATE_LIMIT_MAX_REQUESTS` - Max requests per window
+1. **Strict Type Checking**
+   ```typescript
+   // tsconfig.json
+   {
+     "strict": true,
+     "noImplicitAny": true,
+     "noImplicitReturns": true,
+     "noUnusedLocals": true,
+     "exactOptionalPropertyTypes": true
+   }
+   ```
 
-### Database Configuration
+2. **Interface Definitions**
+   ```typescript
+   interface IUser extends Document {
+     _id: string;
+     username: string;
+     email: string;
+     // ... other properties
+     comparePassword(candidatePassword: string): Promise<boolean>;
+   }
+   ```
 
-MongoDB dengan Mongoose ODM:
-- Automatic connection handling
-- Schema validation
-- Index optimization
-- Connection error handling
+3. **Generic API Responses**
+   ```typescript
+   interface IApiResponse<T = any> {
+     success: boolean;
+     message: string;
+     data?: T;
+     error?: string;
+   }
+   ```
+
+4. **Typed Express Routes**
+   ```typescript
+   router.post('/login', 
+     validateLogin, 
+     async (req: Request<{}, IApiResponse<IAuthResponse>, ILoginRequest>, 
+            res: Response<IApiResponse<IAuthResponse> | IApiError>): Promise<void> => {
+       // Fully typed route handler
+     }
+   );
+   ```
 
 ## 🔐 Security Features
 
-### Password Security
-- Bcrypt hashing dengan salt rounds 12
-- Password complexity validation
-- Secure password comparison
+### Type-Safe Security
+- **Typed JWT Payloads** - JWT tokens use typed interfaces
+- **Typed Middleware** - All authentication middleware is type-safe
+- **Typed Validation** - Input validation with TypeScript support
+- **Typed Error Handling** - Comprehensive error types
 
-### JWT Security
+### Security Implementation
+- Password hashing with bcrypt (salt rounds 12)
 - Short-lived access tokens (15 minutes)
 - Long-lived refresh tokens (7 days)
-- HTTP-only cookies untuk refresh tokens
-- Token rotation pada refresh
-- Multi-device logout support
-
-### API Security
+- HTTP-only cookies for refresh tokens
 - Rate limiting (100 requests per 15 minutes)
 - CORS configuration
 - Helmet security headers
-- Input validation dan sanitization
-- Error handling tanpa information leakage
 
 ## 🚦 Usage Examples
 
-### Frontend Integration (JavaScript)
+### Frontend Integration (TypeScript)
 
-```javascript
-// Login
-const login = async (email, password) => {
+```typescript
+// Types for API responses
+interface AuthResponse {
+  success: boolean;
+  message: string;
+  data: {
+    user: User;
+    accessToken: string;
+  };
+}
+
+interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+// Login function with full typing
+const login = async (credentials: LoginRequest): Promise<AuthResponse> => {
   const response = await fetch('/api/auth/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    credentials: 'include', // Include cookies
-    body: JSON.stringify({ email, password })
+    credentials: 'include',
+    body: JSON.stringify(credentials)
   });
   
-  const data = await response.json();
-  if (data.success) {
-    // Store access token
-    localStorage.setItem('accessToken', data.data.accessToken);
+  if (!response.ok) {
+    throw new Error('Login failed');
   }
-  return data;
+  
+  return response.json() as Promise<AuthResponse>;
 };
 
-// API call dengan authentication
-const makeAuthenticatedRequest = async (url, options = {}) => {
-  const token = localStorage.getItem('accessToken');
-  
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      ...options.headers,
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
-    credentials: 'include'
-  });
-  
-  if (response.status === 401) {
-    // Try to refresh token
-    const refreshResponse = await fetch('/api/auth/refresh', {
+// Type-safe API client
+class ApiClient {
+  private baseUrl: string;
+  private accessToken: string | null = null;
+
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl;
+  }
+
+  async makeAuthenticatedRequest<T>(
+    endpoint: string, 
+    options: RequestInit = {}
+  ): Promise<T> {
+    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      ...options,
+      headers: {
+        ...options.headers,
+        'Authorization': `Bearer ${this.accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include'
+    });
+
+    if (response.status === 401) {
+      // Handle token refresh
+      await this.refreshToken();
+      // Retry request
+      return this.makeAuthenticatedRequest<T>(endpoint, options);
+    }
+
+    return response.json();
+  }
+
+  private async refreshToken(): Promise<void> {
+    const response = await fetch(`${this.baseUrl}/api/auth/refresh`, {
       method: 'POST',
       credentials: 'include'
     });
-    
-    if (refreshResponse.ok) {
-      const refreshData = await refreshResponse.json();
-      localStorage.setItem('accessToken', refreshData.data.accessToken);
-      
-      // Retry original request
-      return fetch(url, {
-        ...options,
-        headers: {
-          ...options.headers,
-          'Authorization': `Bearer ${refreshData.data.accessToken}`,
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include'
-      });
+
+    if (response.ok) {
+      const data = await response.json();
+      this.accessToken = data.data.accessToken;
     } else {
-      // Refresh failed, redirect to login
+      // Redirect to login
       window.location.href = '/login';
     }
   }
-  
-  return response;
-};
+}
 ```
 
-## 🤝 Contributing
+## 🧪 Development
 
-1. Fork the project
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
+### Type Checking
+```bash
+# Run TypeScript compiler without emitting files
+npm run type-check
+
+# Build the project
+npm run build
+
+# Clean build directory
+npm run clean
+```
+
+### Development Workflow
+1. Make changes to TypeScript files in `src/`
+2. TypeScript compiler will check types automatically
+3. `nodemon` will restart the server on file changes
+4. All type errors will be caught at compile time
 
 ## 📄 License
 
